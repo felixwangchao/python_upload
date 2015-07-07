@@ -5,15 +5,6 @@ import os
 import sys
 import mymodule
 
-# extention: only the file who's extension is in this set "extention" can be identified
-# eg:        LeMonde.pdf ----> LeMonde_07_07_2015.pdf       LeMonde.txt ----> LeMonde.txt_07_07_2015
-extension = set(['pdf',])
-# temp_base: we will store the file uploaded in this directory
-temp_base = '/tmp/resumable_images/'
-# CurrentFile: store the name of the file we have already uploaded, not success in the case of supervisor
-CurrentFile = []
-
-
 def app(environ, start_response):
     # when the method is POST, there are two case:
     # CASE 1: the RESUMABLE.js send the POST
@@ -35,28 +26,7 @@ def app(environ, start_response):
             mymodule.handler_rs_POST(_POST)
         # CASE 2: receive the date of publication and change the file name
         else:
-            Date_p = _POST.getvalue("date_p")	
-            Date_f_p = _POST.getvalue("date_f_p")
-            for i in range(1,len(CurrentFile)+1):
-                C_file = CurrentFile.pop()
-                if not os.path.isfile(C_file ):
-                    print "file can't be found"                    
-                    exit(-1)			
-                else: 
-                    file_name_old = os.path.basename(C_file)
-                    List = file_name_old.split('.')
-                    Date_p_tmp = "_"+Date_p.replace('/','_')
-                    if len(List) > 1 and (List[len(List)-1] in extension):
-                        filename_tmp = ".".join(List[0:len(List)-1])
-                        file_name_final = filename_tmp + Date_p_tmp + '.' + List[len(List)-1] 			
-                    else: 
-                        file_name_final = file_name_old + Date_p_tmp
-                    path_old = os.path.join(temp_base,file_name_old)
-                    path_final = os.path.join(temp_base,file_name_final)
-                    os.rename(path_old,path_final)
-   
-       
-        
+            mymodule.handler_no_POST(_POST)
        
     body = u"""
 

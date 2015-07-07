@@ -35,28 +35,7 @@ def app(environ, start_response):
             mymodule.handler_rs_POST(_POST)
         # CASE 2: receive the date of publication and change the file name
         else:
-            Date_p = _POST.getvalue("date_p")	
-            Date_f_p = _POST.getvalue("date_f_p")
-            for i in range(1,len(CurrentFile)+1):
-                C_file = CurrentFile.pop()
-                if not os.path.isfile(C_file ):
-                    print "file can't be found"                    
-                    exit(-1)			
-                else: 
-                    file_name_old = os.path.basename(C_file)
-                    List = file_name_old.split('.')
-                    Date_p_tmp = "_"+Date_p.replace('/','_')
-                    if len(List) > 1 and (List[len(List)-1] in extension):
-                        filename_tmp = ".".join(List[0:len(List)-1])
-                        file_name_final = filename_tmp + Date_p_tmp + '.' + List[len(List)-1] 			
-                    else: 
-                        file_name_final = file_name_old + Date_p_tmp
-                    path_old = os.path.join(temp_base,file_name_old)
-                    path_final = os.path.join(temp_base,file_name_final)
-                    os.rename(path_old,path_final)
-   
-       
-        
+            mymodule.handler_no_POST(_POST)
        
     body = u"""
 
@@ -72,9 +51,9 @@ def app(environ, start_response):
     </head>
 
     <body>
-        File %s uploaded successfully.<br> 
+        File uploaded successfully.<br> 
     </body>
-</html>"""%CurrentFile
+</html>"""
 
     if environ['REQUEST_METHOD'] == 'GET':
         _GET = cgi.parse_qs(environ['QUERY_STRING'])
@@ -85,16 +64,7 @@ def app(environ, start_response):
             else:
                 print "HTTP/1.0 404 Not Found"
                 exit(-1)
-        
-        # for delete, can't be used right now
-        if 'filename_delete' in _GET:
-            print "good try"
-            file_delete = (_GET['filename_delete'])[0]
-            target_delete = os.path.join(temp_base,file_delete)
-            os.remove(target_delete)
-            exit(-1)
 
-          
    
         body = u"""
 
