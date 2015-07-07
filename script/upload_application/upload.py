@@ -297,12 +297,29 @@ def app(environ, start_response):
             
             /* Delete file */
             .deleteFileCSS {display:none;}
-                        
+
+            /* This is the style of our error messages */
+            .error {
+              width  : 100%;
+              padding: 0;
+ 
+              font-size: 80%;
+              color: white;
+              background-color: #900;
+              border-radius: 0 0 5px 5px;
+ 
+              -moz-box-sizing: border-box;
+              box-sizing: border-box;
+            }
+
+            .error.active {
+              padding: 0.3em;
+            }            
         </style>
 
     </head>
     <body>
-        <form  name="test" method="post" action="">
+        <form  name="test" onsubmit="return validateForm()" method="post" action="">
             <label for="File">File:</label> <a href="#" id="browseButton">Select files</a><br>
             <div class="resumable-progress">
                 <table>
@@ -341,6 +358,24 @@ def app(environ, start_response):
               target:'',        
              chunkSize:1*256*1024,
             });
+            var date1 = document.getElementId('champ_date1');
+            var date2 = document.getElementId('champ_date2');
+            var form = document.getElementsByTagName('form')[0];
+            form.addEventListener("submit",function(event){
+                
+                if(!date1.validity.valid){
+                    error.innerHTML = "Please input the date publication"
+                    error.className = "error active";
+                    event.preventDefault();
+                    }
+
+                if(!date2.validity.valid){
+                    error.innerHTML = "Please input the date publication"
+                    error.className = "error active";
+                    event.preventDefault();
+                    }
+                },false
+            );
 
              function deleteFile(filename_delete)
             {
@@ -355,10 +390,10 @@ def app(environ, start_response):
                      alert(http.responseText);
                     }
                 } 
-                http.send(null);
-
-                        
+                http.send(null);                        
               }
+
+         
             
             r.assignBrowse(document.getElementById('browseButton'));
 

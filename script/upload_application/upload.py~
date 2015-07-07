@@ -297,12 +297,13 @@ def app(environ, start_response):
             
             /* Delete file */
             .deleteFileCSS {display:none;}
+
                         
         </style>
 
     </head>
     <body>
-        <form  name="test" method="post" action="">
+        <form  name="test" onsubmit="return validateForm()" method="post" action="">
             <label for="File">File:</label> <a href="#" id="browseButton">Select files</a><br>
             <div class="resumable-progress">
                 <table>
@@ -341,6 +342,24 @@ def app(environ, start_response):
               target:'',        
              chunkSize:1*256*1024,
             });
+            var date1 = document.getElementId('champ_date1');
+            var date2 = document.getElementId('champ_date2');
+            var form = document.getElementsByTagName('form')[0];
+            form.addEventListener("submit",function(event){
+                
+                if(!date1.validity.valid){
+                    error.innerHTML = "Please input the date publication"
+                    error.className = "error date1 active";
+                    event.preventDefault();
+                    }
+
+                if(!date2.validity.valid){
+                    error.innerHTML = "Please input the date publication"
+                    error.className = "error date2 active";
+                    event.preventDefault();
+                    }
+                },false
+            );
 
              function deleteFile(filename_delete)
             {
@@ -355,10 +374,10 @@ def app(environ, start_response):
                      alert(http.responseText);
                     }
                 } 
-                http.send(null);
-
-                        
+                http.send(null);                        
               }
+
+         
             
             r.assignBrowse(document.getElementById('browseButton'));
 
@@ -369,7 +388,7 @@ def app(environ, start_response):
 
               // Add the file to the list
               name_tmp = file.fileName;
-              $('.resumable-list').append('<li class="resumable-file-'+file.uniqueIdentifier+'">Uploading <span class="resumable-file-name"></span> <progress id = "progress" value="70" max="100">100%</progress>');
+              $('.resumable-list').append('<li class="resumable-file-'+file.uniqueIdentifier+'">Uploading <span class="resumable-file-name"></span> <progress id = "progress" value="100" max="100">100%</progress>');
               $('.resumable-file-'+file.uniqueIdentifier+' .resumable-file-name').html(file.fileName);
               // Actually start the upload
               r.upload();
