@@ -319,7 +319,7 @@ def app(environ, start_response):
 
     </head>
     <body>
-        <form  name="test" onsubmit="return validateForm()" method="post" action="">
+        <form  id= "example" name="test" method="post" action="">
             <label for="File">File:</label> <a href="#" id="browseButton">Select files</a><br>
             <div class="resumable-progress">
                 <table>
@@ -358,20 +358,21 @@ def app(environ, start_response):
               target:'',        
              chunkSize:1*256*1024,
             });
-            var date1 = document.getElementId('champ_date1');
-            var date2 = document.getElementId('champ_date2');
-            var form = document.getElementsByTagName('form')[0];
+            var date1 = document.getElementById('champ_date1');
+            var date2 = document.getElementById('champ_date2');
+            var form = document.getElementById('example');
+            
+            
             form.addEventListener("submit",function(event){
-                
-                if(!date1.validity.valid){
-                    error.innerHTML = "Please input the date publication"
-                    error.className = "error active";
+                console.log("submit event");
+                if(!date1.value){
+                    console.log("in the event and ");
+                    alert("Please input the date publication")
                     event.preventDefault();
                     }
 
-                if(!date2.validity.valid){
-                    error.innerHTML = "Please input the date publication"
-                    error.className = "error active";
+                if(!date2.value){
+                    alert("Please input the date fin publication")
                     event.preventDefault();
                     }
                 },false
