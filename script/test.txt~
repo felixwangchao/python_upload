@@ -1,0 +1,9 @@
+[program:upload]
+directory=/home/chao/opt/flasktodo/upload
+command=/home/chao/opt/flasktodo/env/bin/gunicorn --bind=127.0.0.1:8004 upload:app
+user=chao
+autostart=true
+autorestart=true
+environment=FLASKTODO_CONFIG='/home/chao/opt/flasktodo/config.py',PYTHONPATH='.'
+stdout_logfile=/var/log/supervisor/%(program_name)s_stdout.log
+stderr_logfile=/var/log/supervisor/%(program_name)s_stderr.log

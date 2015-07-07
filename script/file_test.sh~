@@ -1,0 +1,9 @@
+echo [program\:upload] > ~/Documents/script/test.txt 
+echo directory=\/home\/chao\/opt\/flasktodo\/upload
+echo command=\/home\/chao\/opt\/flasktodo\/\env\/bin\/gunicorn --bind=127.0.0.1\:8004 upload\:app  >> ~/Documents/script/test.txt
+echo user=chao >> ~/Documents/script/test.txt
+echo autostart=\true >> ~/Documents/script/test.txt
+echo autorestart=\true >> ~/Documents/script/test.txt
+echo environment=FLASKTODO_CONFIG=\'\/home\/chao\/opt\/flasktodo\/config.py\',PYTHONPATH=\'.\' >> ~/Documents/script/test.txt
+echo stdout_logfile=\/var\/log\/supervisor\/%\(program_name)s_stdout.log >> ~/Documents/script/test.txt
+echo stderr_logfile=\/var\/log\/supervisor\/%\(program_name)s_stderr.log >> ~/Documents/script/test.txt
