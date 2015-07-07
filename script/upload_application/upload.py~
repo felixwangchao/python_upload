@@ -3,6 +3,7 @@ import cgitb
 cgitb.enable()
 import os
 import sys
+import mymodule
 
 # extention: only the file who's extension is in this set "extention" can be identified
 # eg:        LeMonde.pdf ----> LeMonde_07_07_2015.pdf       LeMonde.txt ----> LeMonde.txt_07_07_2015
@@ -31,51 +32,7 @@ def app(environ, start_response):
         )
         # CASE 1
         if "resumableChunkNumber" in _POST:
-            # Receive the chunk information in the POST
-            temp_dir = "{}{}".format(temp_base, _POST['resumableChunkNumber'].value)
-            chunk_file = "{}/{}.part{}".format(temp_dir, _POST['resumableFilename'].value, _POST['resumableChunkNumber'].value)
-            fileitem = _POST['file']
-            print "this is the file name",fileitem.filename
-            file_path = chunk_file
-
-            counter = 0
-            # If the path not exist, create a new one
-            if not os.path.exists(file_path):
-                os.makedirs(temp_dir)
-            # Save the file in the tempory directory
-            with open(file_path, 'wb') as output_file:
-                while 1:
-                    data = fileitem.file.read(1024)
-                    if not data:
-                        break
-                    output_file.write(data)
-                    counter += 1
-                    if counter == 100:
-                        counter = 0
-
-            # calcul the current size and receive the file size
-            currentSize =  int(_POST['resumableChunkNumber'].value) * (int(_POST['resumableChunkSize'].value)-1)
-            filesize = int(_POST['resumableTotalSize'].value)
-
-            # if all of the chunk were received, collect all of the chunk and create a new file
-            if currentSize + int(_POST['resumableCurrentChunkSize'].value)>= filesize:
-                print "entrez dans l'integration"
-                print "*************************"
-                target_file_name = "{}/{}".format(temp_base,_POST['resumableFilename'].value)
-                with open(target_file_name, "ab") as target_file:
-                    for i in range(1,int(_POST['resumableChunkNumber'].value)+1):
-                        print i
-                        stored_chunk_file_name = "{}{}/{}.part{}".format(temp_base,str(i), _POST['resumableFilename'].value,str(i))
-                        stored_chunk_file = open(stored_chunk_file_name, 'rb')
-                        target_file.write( stored_chunk_file.read() )
-                        stored_chunk_file.close()
-                        os.unlink(stored_chunk_file_name)
-                        temp_dir = os.path.join(temp_base,str(i))
-                        os.rmdir(temp_dir)
-
-                target_file.close()
-                # to remember the name of the file
-                CurrentFile.append(target_file_name)
+            mymodule.handler_rs_POST(_POST)
         # CASE 2: receive the date of publication and change the file name
         else:
             Date_p = _POST.getvalue("date_p")	
@@ -120,23 +77,16 @@ def app(environ, start_response):
 </html>"""%CurrentFile
 
     if environ['REQUEST_METHOD'] == 'GET':
-   
         _GET = cgi.parse_qs(environ['QUERY_STRING'])
-        if 'resumableChunkNumber' in _GET:
-            print "good", _GET['resumableChunkNumber']
-            temp_dir = "{}{}".format(temp_base, (_GET['resumableIdentifier'])[0])
-                #print "temp_dir is ",temp_dir
-            chunk_file = "{}/{}.part{}".format(temp_dir, (_GET['resumableFilename'])[0],  (_GET['resumableChunkNumber'])[0])
-                #print "chunk_file is", chunk_file
-                #import pdb
-                #pdb.set_trace()
 
-            if not os.path.isfile(chunk_file):
+        if 'resumableChunkNumber' in _GET:
+            if mymodule.handler_rs_GET(_GET) == True:
+                return 'ok'
+            else:
                 print "HTTP/1.0 404 Not Found"
                 exit(-1)
-            else:
-                return 'ok'
-
+        
+        # for delete, can't be used right now
         if 'filename_delete' in _GET:
             print "good try"
             file_delete = (_GET['filename_delete'])[0]
@@ -294,22 +244,6 @@ def app(environ, start_response):
             .is-error .uploader-item:hover, .is-active.is-error .uploader-item {border-color:#900;}
             .is-error .uploader-item:hover .uploader-item-title, .is-active.is-error .uploader-item .uploader-item-title {background-   color:rgba(153,0,0,0.6);}
             .is-error .uploader-item-creating-thumbnail {display:none;}
-            
-            /* Delete file */
-            .deleteFileCSS {display:none;}
-
-            /* This is the style of our error messages */
-            .error {
-              width  : 100%;
-              padding: 0;
- 
-              font-size: 80%;
-              color: white;
-              background-color: #900;
-              border-radius: 0 0 5px 5px;
- 
-              -moz-box-sizing: border-box;
-              box-sizing: border-box;
             }
 
             .error.active {
@@ -367,14 +301,12 @@ def app(environ, start_response):
                 console.log("submit event");
                 if(!date1.value){
                     console.log("in the event and ");
-                    error.innerHTML = "Please input the date publication";
-                    error.className = "error active";
+                    alert("Please input the date publication")
                     event.preventDefault();
                     }
 
                 if(!date2.value){
-                    error.innerHTML = "Please input the date publication"
-                    error.className = "error active";
+                    alert("Please input the date fin publication")
                     event.preventDefault();
                     }
                 },false
