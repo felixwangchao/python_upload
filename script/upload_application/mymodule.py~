@@ -66,8 +66,9 @@ def collect(_POST):
                 temp_dir = os.path.join(temp_base,str(i))
                 os.rmdir(temp_dir)
         target_file.close()
-
-        CurrentFile.append(target_file_name)
+        f = open('/tmp/CurrentFile.txt','a+')
+        f.write(target_file_name+"\n")
+        f.close()
             
 
 
@@ -76,8 +77,18 @@ def handler_no_POST(_POST):
 
     Date_p = _POST.getvalue("date_p")	
     Date_f_p = _POST.getvalue("date_f_p")
-    f = file(CurrentListFile)
-    CurrentFile = p.load(f)
+    
+    
+    f2=open('/tmp/CurentFile.txt','r+')
+    f2.write(os.getcwd())
+    line = f2.readline()
+
+    while line !="":
+        CurrentFile.append(line)
+    f2.close()
+    
+    os.remove('/tmp/CurentFile.txt')    
+    
     for i in range(1,len(CurrentFile)+1):
         C_file = CurrentFile.pop()
         if not os.path.isfile(C_file):
