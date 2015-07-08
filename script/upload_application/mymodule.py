@@ -1,17 +1,17 @@
+# Auteur: Chao
+# Filename: mymodule.py
+
 import os
 import sys
 import logging
-
-CurrentListFile = 'CurrentFile.data'
-CurrentFile = []
 
 # extention: only the file who's extension is in this set "extention" can be identified
 # eg:        LeMonde.pdf ----> LeMonde_07_07_2015.pdf       LeMonde.txt ----> LeMonde.txt_07_07_2015
 extension = set(['pdf',])
 # temp_base: we will store the file uploaded in this directory
 temp_base = '/tmp/resumable_images/'
-# CurrentFile: store the name of the file we have already uploaded, not success in the case of supervisor
-
+# CurrentFile: store the name of the file we have already uploaded
+CurrentFile = []
 
 
 
@@ -20,8 +20,12 @@ def handler_rs_GET(_GET):
     '''This function is used to deal with the GET sended by resumable.js
 
         _GET = cgi.parse_qs(environ['QUERY_STRING'])'''
+    # create a tempory directory
     temp_dir = "{}{}".format(temp_base, (_GET['resumableIdentifier'])[0])
+    # create a path for the chunk
     chunk_file = "{}/{}.part{}".format(temp_dir, (_GET['resumableFilename'])[0],  (_GET['resumableChunkNumber'])[0])
+    # if this directory has already been created, it means that this chunk has already been sended
+ 
     if not os.path.isfile(chunk_file):
         return False
     else:
@@ -44,6 +48,7 @@ def handler_rs_POST(_POST):
 
     # Save the file in the tempory directory
     counter = 0
+    # Write on binary
     with open(file_path, 'wb') as output_file:
         while 1:
             data = fileitem.file.read(1024)
@@ -61,10 +66,11 @@ def collect(_POST):
     ''' This function is used to collect all the small chunk and write them in a new file
 
         the _POST = _POST = cgi.FieldStorage(...) '''
- 
+    # Because the last chunk is bigger than a normal chunk
     currentSize =  int(_POST['resumableChunkNumber'].value) * (int(_POST['resumableChunkSize'].value)-1)
     filesize = int(_POST['resumableTotalSize'].value)
 
+    # if all the chunks were been received, collect all the chunk and delete all the tempory directory
     if currentSize + int(_POST['resumableCurrentChunkSize'].value)>= filesize:
         target_file_name = "{}/{}".format(temp_base,_POST['resumableFilename'].value)
         with open(target_file_name, "ab") as target_file:
@@ -77,6 +83,8 @@ def collect(_POST):
                 temp_dir = os.path.join(temp_base,str(i))
                 os.rmdir(temp_dir)
         target_file.close()
+
+        # write the final path in a file txt
         f = open('/tmp/CurrentFile.txt','a+')
         filename_target_tmp = temp_base + os.path.basename(target_file_name)
         f.write(filename_target_tmp+"\n")
@@ -90,12 +98,14 @@ def handler_no_POST(_POST):
     ''' This function is used to deal with a normal request POST submit from "form"
 
         the _POST = _POST = cgi.FieldStorage(...) ''' 
-
+    # Get the date from the form
     Date_p = _POST.getvalue("date_p")	
     Date_f_p = _POST.getvalue("date_f_p")
     
+    # update all the path into the CurrentFile
     update_CurrentFile()
-        
+    
+    # Open every path and rename the file    
     for i in range(1,len(CurrentFile)+1):
         C_file = CurrentFile.pop()
         logging.warning('WARNING! '+C_file)
@@ -121,6 +131,7 @@ def update_CurrentFile():
     
     logging.warning('WARNING! remove the txt')
     os.remove('/tmp/CurrentFile.txt')
+
 
 def rename_file(file_real, Date_p):
     '''This function is used to rename a file with his path and the publication date
