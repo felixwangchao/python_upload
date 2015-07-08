@@ -17,6 +17,9 @@ temp_base = '/tmp/resumable_images/'
 
 # handler: for trait the GET from resumable.js
 def handler_rs_GET(_GET): 
+    '''This function is used to deal with the GET sended by resumable.js
+
+        _GET = cgi.parse_qs(environ['QUERY_STRING'])'''
     temp_dir = "{}{}".format(temp_base, (_GET['resumableIdentifier'])[0])
     chunk_file = "{}/{}.part{}".format(temp_dir, (_GET['resumableFilename'])[0],  (_GET['resumableChunkNumber'])[0])
     if not os.path.isfile(chunk_file):
@@ -27,6 +30,9 @@ def handler_rs_GET(_GET):
 
 # handler: for trait the POST from resumable.js
 def handler_rs_POST(_POST):
+    ''' This function is used to deal with the POST sended by resumable.js
+
+        the _POST = _POST = cgi.FieldStorage(...) '''
     temp_dir = "{}{}".format(temp_base, _POST['resumableChunkNumber'].value)
     chunk_file = "{}/{}.part{}".format(temp_dir, _POST['resumableFilename'].value, _POST['resumableChunkNumber'].value)
     fileitem = _POST['file']
@@ -52,6 +58,10 @@ def handler_rs_POST(_POST):
 
 
 def collect(_POST):
+    ''' This function is used to collect all the small chunk and write them in a new file
+
+        the _POST = _POST = cgi.FieldStorage(...) '''
+ 
     currentSize =  int(_POST['resumableChunkNumber'].value) * (int(_POST['resumableChunkSize'].value)-1)
     filesize = int(_POST['resumableTotalSize'].value)
 
@@ -77,11 +87,30 @@ def collect(_POST):
 
 # handler for trait the POST from form
 def handler_no_POST(_POST):
+    ''' This function is used to deal with a normal request POST submit from "form"
+
+        the _POST = _POST = cgi.FieldStorage(...) ''' 
 
     Date_p = _POST.getvalue("date_p")	
     Date_f_p = _POST.getvalue("date_f_p")
     
-    
+    update_CurrentFile()
+        
+    for i in range(1,len(CurrentFile)+1):
+        C_file = CurrentFile.pop()
+        logging.warning('WARNING! '+C_file)
+        file_real = C_file.replace("\n","")
+        if not os.path.isfile(file_real):               
+            continue			
+        else:
+            rename_file(file_real, Date_p) 
+            
+
+def update_CurrentFile():
+    '''This function is used to update the list CurrentFile, CurrentFile record the path of all the file uploaded
+
+       It takes no arguments, because CurrentFile is a list global'''
+
     f2=open('/tmp/CurrentFile.txt','r+')
     line = f2.readline()
 
@@ -91,29 +120,26 @@ def handler_no_POST(_POST):
     f2.close()
     
     logging.warning('WARNING! remove the txt')
-    os.remove('/tmp/CurrentFile.txt')    
-    
-    for i in range(1,len(CurrentFile)+1):
-        C_file = CurrentFile.pop()
-        logging.warning('WARNING! '+C_file)
-        file_real = C_file.replace("\n","")
-        if not os.path.isfile(file_real):               
-            continue			
-        else: 
-            file_name_old = os.path.basename(file_real)
-            List = file_name_old.split('.')
-            Date_p_tmp = "_"+Date_p.replace('/','_')
-            logging.warning('WARNING! extention probleme '+List[len(List)-1])
-            if len(List) > 1 and (List[len(List)-1] == 'pdf'):
-                filename_tmp = ".".join(List[0:len(List)-1])
-                file_name_final = filename_tmp + Date_p_tmp + '.' + List[len(List)-1]
-                path_old = os.path.join(temp_base,file_name_old)
-                path_final = os.path.join(temp_base,file_name_final)
-                os.rename(path_old,path_final) 			
-            else: 
-                file_name_final = file_name_old + Date_p_tmp
-                path_old = os.path.join(temp_base,file_name_old)
-                path_final = os.path.join(temp_base,file_name_final)
-                os.rename(path_old,path_final)
+    os.remove('/tmp/CurrentFile.txt')
 
+def rename_file(file_real, Date_p):
+    '''This function is used to rename a file with his path and the publication date
+
+       file_real is his path, Date publication is the date'''
+
+    file_name_old = os.path.basename(file_real)
+    List = file_name_old.split('.')
+    Date_p_tmp = "_"+Date_p.replace('/','_')
+    logging.warning('WARNING! extention probleme '+List[len(List)-1])
+    if len(List) > 1 and (List[len(List)-1] == 'pdf'):
+        filename_tmp = ".".join(List[0:len(List)-1])
+        file_name_final = filename_tmp + Date_p_tmp + '.' + List[len(List)-1]
+        path_old = os.path.join(temp_base,file_name_old)
+        path_final = os.path.join(temp_base,file_name_final)
+        os.rename(path_old,path_final) 			
+    else: 
+        file_name_final = file_name_old + Date_p_tmp
+        path_old = os.path.join(temp_base,file_name_old)
+        path_final = os.path.join(temp_base,file_name_final)
+        os.rename(path_old,path_final)     
 
