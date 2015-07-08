@@ -14,6 +14,10 @@ bash auto_setup.sh
 To test, use
 bash launch.sh
 
+The files will be placed in the path below
+/tmp/resumable_images
+
+
 ***************************************************************************
 
 7/7/2015 
