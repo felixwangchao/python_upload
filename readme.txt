@@ -1,5 +1,20 @@
+****************************
 Auteur: WANG Chao
 Sujet: Petite interface web
+****************************
+
+This is a small project, it is used to create a interface of upload
+I use python-cgi for the part of server and resumable.js to upload the file 
+
+***************************************************************************
+
+To setup, use 
+bash auto_setup.sh
+
+To test, use
+bash launch.sh
+
+***************************************************************************
 
 7/7/2015 
 Progress:
