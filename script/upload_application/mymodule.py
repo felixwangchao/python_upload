@@ -1,5 +1,6 @@
 import os
 import sys
+import logging
 
 CurrentListFile = 'CurrentFile.data'
 CurrentFile = []
@@ -66,10 +67,11 @@ def collect(_POST):
                 temp_dir = os.path.join(temp_base,str(i))
                 os.rmdir(temp_dir)
         target_file.close()
-        #f = open('/tmp/CurrentFile.txt','a+')
-        #f.write(target_file_name+"\n")
-        #f.close()
-        CurrentFile.append(target_file_name)
+        f = open('/tmp/CurrentFile.txt','a+')
+        filename_target_tmp = temp_base + os.path.basename(target_file_name)
+        f.write(filename_target_tmp+"\n")
+        logging.warning(filename_target_tmp)
+        f.close()
             
 
 
@@ -80,29 +82,34 @@ def handler_no_POST(_POST):
     Date_f_p = _POST.getvalue("date_f_p")
     
     
-    #f2=open('/tmp/CurentFile.txt','w+')
-    #f2.write(os.getcwd())
-    #line = f2.readline()
+    f2=open('/tmp/CurrentFile.txt','r+')
+    line = f2.readline()
 
-    #while line !="":
-        #CurrentFile.append(line)
-    #f2.close()
+    while line !="":
+        CurrentFile.append(line)
+        line = f2.readline()
+    f2.close()
     
-    #os.remove('/tmp/CurentFile.txt')    
+    logging.warning('WARNING! remove the txt')
+    os.remove('/tmp/CurrentFile.txt')    
     
     for i in range(1,len(CurrentFile)+1):
         C_file = CurrentFile.pop()
-        if not os.path.isfile(C_file):
-            print "file can't be found"                    
-            exit(-1)			
+        logging.warning('WARNING! '+C_file)
+        file_real = C_file.replace("\n","")
+        if not os.path.isfile(file_real):               
+            continue			
         else: 
-            print C_file
-            file_name_old = os.path.basename(C_file)
+            file_name_old = os.path.basename(file_real)
             List = file_name_old.split('.')
             Date_p_tmp = "_"+Date_p.replace('/','_')
-            if len(List) > 1 and (List[len(List)-1] in extension):
+            logging.warning('WARNING! extention probleme '+List[len(List)-1])
+            if len(List) > 1 and (List[len(List)-1] == 'pdf'):
                 filename_tmp = ".".join(List[0:len(List)-1])
-                file_name_final = filename_tmp + Date_p_tmp + '.' + List[len(List)-1] 			
+                file_name_final = filename_tmp + Date_p_tmp + '.' + List[len(List)-1]
+                path_old = os.path.join(temp_base,file_name_old)
+                path_final = os.path.join(temp_base,file_name_final)
+                os.rename(path_old,path_final) 			
             else: 
                 file_name_final = file_name_old + Date_p_tmp
                 path_old = os.path.join(temp_base,file_name_old)
