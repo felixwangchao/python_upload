@@ -215,44 +215,125 @@ def app(environ, start_response):
 
                 .error.active {
                   padding: 0.3em;
-                }            
+                } 
+
+
+
+
+                /* style de Bruno */
+                body {
+                    font-family: arial;
+
+                    padding: 50px 10% 50px 10%;
+                }
+
+                h1 {
+                    padding-left: 50px;
+                    margin-bottom: 100px;
+                }
+
+                div.editor_technical_contact_container {
+                    position: relative;
+                    z-index: 1;
+                    top: 0;
+                    width: 100%;
+                }
+
+                div.editor_technical_contact {
+                    position: absolute;
+
+                    right: 0;
+
+                    text-align: left;
+
+                    border: 1px solid grey;
+                    border-radius: 5px;
+                    padding: 10px;
+                }
+
+                div.main {
+                    z-index: 0;
+                }
+
+                fieldset {
+                    margin-top: 15px;
+                    border-radius: 10px;
+                }
+
+                input.file_size {
+                    background-color: green;
+                    border-radius: 10px;
+                }
+
+                input.file_type {
+                    background-color: red;
+                    border-radius: 10px;
+                }
+
+                div.submit {
+                    text-align: center;
+      
+                    margin-top: 50px;
+                    margin-left: 100px;
+                    margin-right: 100px;
+                }
+
+                div.submit input[type=submit] {
+                    margin-left: 200px;
+                }
+
+                span.ref {
+                    font-size: smaller;
+                    color: blue;
+                }
+               
             </style>
 
         </head>
         <body>
-            <form  id= "example" name="test" method="post" action="">
-                <label for="File">File:</label> <a href="#" id="browseButton">Select files</a><br>
-                <div class="resumable-progress">
-                    <table>
-                     <tr>
-                       <td width="90%"><div class="progress-container"><div class="progress-bar"></div></div></td>
-                       <td class="progress-text" nowrap="nowrap"></td>
-                       <td class="progress-pause" nowrap="nowrap">
-                         <a href="#" onclick="r.upload(); return(false);" class="progress-resume-link"><img src="https://lh6.ggpht.com/GUkQ_-dwSw6o-QwQwfJRSZgwzF-rSmcgW5TrBcmBMHtfP5mT52uZfYscELcqBIsPx40=w300" title="Resume upload"  height="42" width="42"/></a>
-                         <a href="#" onclick="r.pause(); return(false);" class="progress-pause-link"><img src="http://uxrepo.com/static/icon-sets/elusive/svg/pause-circled.svg" title="Pause upload"  height="42" width="42"/></a>
-                       </td>
-                     </tr>
-                   </table>
-                 </div>
-                <br>
-                 <ul class="resumable-list"></ul>
-                <br>
-                <label for="date_pu">Date publication:</label><br><input type="text" id="champ_date1" name="date_p" size="15">
-                <div id="calendarMain1"></div>
-                    <script type="text/javascript">
-                        calInit("calendarMain1", "", "champ_date1", "jsCalendar", "day", "selectedDay");
-                    </script>
-
-
-                <label for="date_fin_pu">Date fin publication:</label><br><input type="text" id="champ_date2" name="date_f_p" size="15"></p>
-                <div id="calendarMain2"></div>
-                    <script type="text/javascript">
-                        calInit("calendarMain2", "", "champ_date2", "jsCalendar", "day", "selectedDay");
-                    </script>
-
-                <button type="submit" class="pure-button pure-button-primary">Submit</button>
-            </form>
-
+            <div class="editor_technical_contact_container">
+                <div class="editor_technical_contact">
+	                <h3>Editor Technical Contact:</h3>
+	                <p><span class="ref">(12)</span>&lt;&lt;Title&gt;&gt;<span class="ref">(13)</span>&lt;&lt;Name&gt;&gt;<span class="ref">(14)</span>&lt;&lt;Surname&gt;&gt;</p>
+	                <p><span class="ref">(15)</span>&lt;&lt;Email&gt;&gt;</p>
+	                <p><span class="ref">(16)</span>&lt;&lt;International phone number&gt;&gt;</p>
+                </div>
+            </div>
+            <div class="main">
+                <h1>Adaptive Upload</h1>
+                <h2><span class="ref">(1)</span>&lt;&lt;Editor&gt;&gt; - <span class="ref">(2)</span>&lt;&lt;Publication Title&gt;&gt;</h2>
+                <form  id= "example" name="test" method="post" action="">
+                    <fieldset>
+	                    <legend>File selection:</legend>
+                        <a href="#" id="browseButton">Select files</a><ul class="resumable-list"></ul><br>
+                    </fieldset>
+                    <fieldset>
+                    <legend>Publication:</legend>
+                    <input type="text" id="champ_date1" name="date_p" size="25" value="<<Publication Start Date>>"><input type="text" value="<<Publication start time>>"/>
+                    <div id="calendarMain1"></div>
+                        <script type="text/javascript">
+                            calInit("calendarMain1", "", "champ_date1", "jsCalendar", "day", "selectedDay");
+                        </script>
+                    
+                    <input type="text" id="champ_date2" name="date_f_p" size="25" value="<<Publication End Date>>" ><br/>    
+                    <div id="calendarMain2"></div>
+                        <script type="text/javascript">
+                            calInit("calendarMain2", "", "champ_date2", "jsCalendar", "day", "selectedDay");
+                        </script>
+                    <input type="text" value="<<Publication number>>" /><br/>
+                    </fieldset>
+                    <fieldset>
+                        <legend>Status:</legend>
+	                    <input type="button" class="file_size" value="File size" onclick = displaysize() /><span id = "filesize"></span><br/>
+	                    <input type="button" class="file_type" value="File type" onclick = displayFiletype() /> <span id = "filetype"></span>
+	                </fieldset>
+            
+                    <div class="submit">
+	                    <input type="button" value="Cancel" />
+	                    <input type="submit" />
+	                </div>
+                </form>
+            </div>
 
             <script>
                 var r = new Resumable({
@@ -262,6 +343,8 @@ def app(environ, start_response):
                 var date1 = document.getElementById('champ_date1');
                 var date2 = document.getElementById('champ_date2');
                 var form = document.getElementById('example');
+                
+                var file_resumable;
                 
                 
                 form.addEventListener("submit",function(event){
@@ -294,8 +377,37 @@ def app(environ, start_response):
                     } 
                     http.send(null);                        
                   }
-
-             
+                  function displaysize()
+                {
+                    var a = r.getSize();
+                    var b = "B";
+                    if (a/1024 >= 1)
+                        {
+                            a = a / 1024;
+                            b = "KB";
+                            if(a/1024 >= 1)
+                                {
+                                    a = a/1024;            
+                                    b = "MB";
+                                    if(a/1024 >=1)
+                                        {
+                                            a = a/1024;
+                                            b = "GB";    
+                                        }                    
+                                }
+                            
+                        }
+                    a = a * 100
+                    a = Math.ceil(a);
+                    a = a/100
+                    size = a.toString() + b;
+                    document.getElementById('filesize').innerHTML = size;       
+                }  
+                  function displayFiletype()
+                {
+                    extension = file_resumable.fileName.split('.').pop();
+                    document.getElementById('filetype').innerHTML = extension;
+                }
                 
                 r.assignBrowse(document.getElementById('browseButton'));
 
@@ -306,9 +418,11 @@ def app(environ, start_response):
 
                   // Add the file to the list
                   name_tmp = file.fileName;
+                  file_resumable = file;
                   $('.resumable-list').append('<li class="resumable-file-'+file.uniqueIdentifier+'">Uploading <span class="resumable-file-name"></span> <progress id = "progress" value="100" max="100">100%</progress>');
                   $('.resumable-file-'+file.uniqueIdentifier+' .resumable-file-name').html(file.fileName);
                   // Actually start the upload
+                  
                   r.upload();
                 });
               r.on('pause', function(){
