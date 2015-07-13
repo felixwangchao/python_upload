@@ -381,24 +381,24 @@ def app(environ, start_response):
                 {
                     var a = r.getSize();
                     var b = "B";
-                    if (a/1024 >= 1)
+                    if (a/1000 >= 1)
                         {
-                            a = a / 1024;
+                            a = a / 1000;
                             b = "KB";
                             if(a/1024 >= 1)
                                 {
-                                    a = a/1024;            
+                                    a = a/1000;            
                                     b = "MB";
                                     if(a/1024 >=1)
                                         {
-                                            a = a/1024;
+                                            a = a/1000;
                                             b = "GB";    
                                         }                    
                                 }
                             
                         }
                     a = a * 100
-                    a = Math.ceil(a);
+                    a = Math.round(a);
                     a = a/100
                     size = a.toString() + b;
                     document.getElementById('filesize').innerHTML = size;       
@@ -418,9 +418,7 @@ def app(environ, start_response):
 
                   // Add the file to the list
                   name_tmp = file.fileName;
-                  extension = file.fileName.split('.').pop();
                   file_resumable = file;
-                  document.getElementById('filetype').innerHTML = extension;  
                   $('.resumable-list').append('<li class="resumable-file-'+file.uniqueIdentifier+'">Uploading <span class="resumable-file-name"></span> <progress id = "progress" value="100" max="100">100%</progress>');
                   $('.resumable-file-'+file.uniqueIdentifier+' .resumable-file-name').html(file.fileName);
                   // Actually start the upload

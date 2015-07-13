@@ -381,25 +381,25 @@ def app(environ, start_response):
                 {
                     var a = r.getSize();
                     var b = "B";
-                    if (a/1024 >= 1)
+                    if (a/1000 >= 1)
                         {
-                            a = a / 1024;
+                            a = a / 1000;
                             b = "KB";
                             if(a/1024 >= 1)
                                 {
-                                    a = a/1024;            
+                                    a = a/1000;            
                                     b = "MB";
                                     if(a/1024 >=1)
                                         {
-                                            a = a/1024;
+                                            a = a/1000;
                                             b = "GB";    
                                         }                    
                                 }
                             
                         }
-                    a = a * 100
-                    a = Math.ceil(a);
-                    a = a/100
+                    a = a * 10
+                    a = Math.round(a);
+                    a = a/10
                     size = a.toString() + b;
                     document.getElementById('filesize').innerHTML = size;       
                 }  
